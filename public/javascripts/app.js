@@ -125,17 +125,65 @@ var albumMarconi = {
   ]
 };
 
+var currentlyPlayingSong = null;
 var createSongRow = function(songNumber, songName, songLength){
-  var template = 
-         '<tr>'
-     + '  <td class="col-md-1">' + songNumber + '</td>'
-     + '  <td class="col-md-9">' + songName + '</td>'
-     + '  <td class="col-md-2">' + songLength + '</td>'
-     + '</tr>'
-     ;
- 
-   return $(template);
+  var template =
+      '<tr>'
+    + '  <td class="song-number col-md-1" data-song-number="' + songNumber + '">' + songNumber + '</td>'
+    + '  <td class="col-md-9">' + songName + '</td>'
+    + '  <td class="col-md-2">' + songLength + '</td>'
+    + '</tr>'
+  ; 
+   var $row = $(template);
+
+   var onHover = function(event){
+    var songNumberCell = $(this).find('.song-number');
+    var songNumber = songNumberCell.data('song-number');
+    if(songNumber !== currentlyPlayingSong){
+      songNumberCell.html('<a class="album-song-button"><i class="fa fa-play"></i></a>');
+    }
+   };
+
+   var offHover = function(event){
+    var songNumberCell = $(this).find('.song-number');
+    var songNumber = songNumberCell.data('song-number');
+      if(songNumber !== currentlyPlayingSong){
+        songNumberCell.html(songNumber);
+      }
+   };
+
+   $row.hover(onHover, offHover);
+   return $row;
+
 }
+
+
+// toggle play, pause and song number based on the button click
+
+var clickHandler = function(event){
+  var songNumber = $(this)
+  if(currentlyPlayingSong !== null){
+    // revert to song number for currently playing song because user started playing a new song
+    currentlyPlayingSong = $('.song-number[data-song-number="' + currentlyPlayingSong + '"]');
+    currentlyPlayingSong.html(currentlyPlayingSong);
+  }
+
+  if(currentlyPlayingSong !== songNumber){
+    // switch from play --> pause button to indicate new song is playing
+    $(this).html('<a class="album-song-button"><i class="fa fa-pause"></i></a>')
+    currentlyPlayingSong = songNumber;
+
+  } else if (currentlyPlayingSong === songNumber){
+    // switch from pause --> play button to pause playing song
+    $(this).html('<a class="album-song-button"><i class="fa fa-play"></i></a>')
+  }
+
+  $row.find('.song-number').click(clickHandler);
+$row.hover(onHover, offHover);
+};
+
+
+
 
 var changeAlbumView = function (){
      var album = albumPicasso;
@@ -167,6 +215,7 @@ var changeAlbumView = function (){
     }
 
 };
+
 
 if(document.URL.match(/\/album.html/)){
   $(document).ready(function(){
