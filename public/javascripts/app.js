@@ -137,35 +137,42 @@ var createSongRow = function(songNumber, songName, songLength){
    return $(template);
 }
 
-if(document.URL.match(/\/album.html/)){
-  $(document).ready(function(){
-    var album = albumPicasso;
-
+var changeAlbumView = function (){
+     var album = albumPicasso;
+     
     // update album title 
-    var $albumTitle = $(".album-title");
-    $albumTitle.text(album.name);
+      var $albumTitle = $(".album-title");
+      $albumTitle.text(album.name);
 
     // update the album artist
-    var $albumArtist = $(".album-artist");
-    $albumArtist.text(album.artist);
+      var $albumArtist = $(".album-artist");
+      $albumArtist.text(album.artist);
 
     // update the meta information
-    var $albumMeta = $(".album-meta-info");
-    $albumMeta.text(album.year + " on " + album.label);
+      var $albumMeta = $(".album-meta-info");
+      $albumMeta.text(album.year + " on " + album.label);
 
     // update the album image
-    var $albumImage = $(".album-image img");
-    $albumImage.attr('src', album.albumArtUrl);
+      var $albumImage = $(".album-image img");
+      $albumImage.attr('src', album.albumArtUrl);
 
     // Update the Song list
-    var $songList = $(".album-song-listing");
-    $songList.empty();
-    var songs = album.songs;
-    for(var i = 0; i < songs.length; i++){
-      var songData = songs[i];
-      var $newRow = createSongRow(i + 1, songData.name, songData.length);
-      $songList.append($newRow);
+      var $songList = $(".album-song-listing");
+      $songList.empty();
+      var songs = album.songs;
+      for(var i = 0; i < songs.length; i++){
+        var songData = songs[i];
+        var $newRow = createSongRow(i + 1, songData.name, songData.length);
+        $songList.append($newRow);
     }
+
+};
+
+if(document.URL.match(/\/album.html/)){
+  $(document).ready(function(){
+
+
+   changeAlbumView(albumPicasso);
   });
 }
 });
@@ -181,7 +188,9 @@ if(document.URL.match(/\/album.html/)){
 var buildAlbumThumbnail = function (){
   var template =
        '<div class="collection-album-container col-md-2">'
-     + '  <img src="/images/album-placeholder.png"/>'
+     + '  <div class="collection-album-image-container">'
+     + '    <img src="/images/album-placeholder.png"/>'
+     + '  </div>'
      + '  <div class="caption album-collection-info">'
      + '    <p>'
      + '      <a class="album-name" href="/album.html"> Album Name </a>'
@@ -199,6 +208,22 @@ var buildAlbumThumbnail = function (){
     return $(template);
 }
 
+var buildAlbumOverlay = function(albumURL){
+  var template = 
+          '<div class="collection-album-image-overlay">'
+      + '  <div class="collection-overlay-content">'
+      + '    <a class="collection-overlay-button" href="' + albumURL + '">'
+      + '      <i class="fa fa-play"></i>'
+      + '    </a>'
+      + '    &nbsp;'
+      + '    <a class="collection-overlay-button">'
+      + '      <i class="fa fa-plus"></i>'
+      + '    </a>'
+      + '  </div>'
+      + '</div>'
+      ;
+      return $(template);
+};
 
 var updateCollectionView = function(){
   var $collection = $('.collection-container .row');
@@ -208,6 +233,16 @@ var updateCollectionView = function(){
       var $newThumbnail = buildAlbumThumbnail();
       $collection.append($newThumbnail);
     }
+
+    var onHover = function(event){
+      $(this).append(buildAlbumOverlay("/album.html"));
+    };
+
+    var offHover = function(event){
+      $(this).find('.collection-album-image-overlay').remove();
+    }
+
+    $collection.find('.collection-album-image-container').hover(onHover, offHover);
 }
 
 if(document.URL.match(/\/collection.html/)){
