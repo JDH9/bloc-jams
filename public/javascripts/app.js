@@ -179,7 +179,7 @@ var clickHandler = function(event){
   }
 
   $row.find('.song-number').click(clickHandler);
-$row.hover(onHover, offHover);
+  $row.hover(onHover, offHover);
 };
 
 
