@@ -123,11 +123,53 @@ var changeAlbumView = function (){
 
 };
 
+var updateSeekPercentage = function($seekBar, event){
+  var barWidth = $seekBar.width();
+  var offsetX = event.pageX - $seekBar.offset().left;
+
+  var offsetXPercentage = (offsetX / barWidth) * 100;
+  offsetXPercentage = Math.max(0, offsetXPercentage);
+  offsetXPercentage = Math.min(100, offsetXPercentage);
+
+
+  var percentageString = offsetXPercentage + "%";
+  $seekBar.find('.fill').width(percentageString);
+  $seekBar.find('.thumb').css({left: percentageString});
+}
+
+var setupSeekBars = function(){
+  $seekBars = $('.player-bar .seek-bar');
+  $seekBars.click(function(event){
+    updateSeekPercentage($(this), event);
+  });
+
+  $seekBars.find('.thumb').mousedown(function(event){
+    var $seekBar = $(this).parent();  
+
+    $seekBar.addClass('no-animate');
+
+    
+    $(document).bind('.mousemove.thumb', function(event){
+      updateSeekPercentage($seekBar, event);
+    });
+
+    $(document).bind('mouseup.thumb', function(event){
+
+      $seekBar.removeClass('no-animate');
+
+      $(document).unbind('mousemove.thumb');
+      $(document).unbind('mouseup.thumb');
+
+    });
+  });
+};
+
 
 if(document.URL.match(/\/album.html/)){
   $(document).ready(function(){
 
 
    changeAlbumView(albumPicasso);
+   setupSeekBars();
   });
 }
