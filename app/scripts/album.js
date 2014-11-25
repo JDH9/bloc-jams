@@ -143,6 +143,8 @@ var setupSeekBars = function(){
     updateSeekPercentage($(this), event);
   });
 
+
+
   $seekBars.find('.thumb').mousedown(function(event){
     var $seekBar = $(this).parent();  
 
