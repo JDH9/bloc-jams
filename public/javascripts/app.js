@@ -187,6 +187,8 @@ var clickHandler = function(event){
 
 var changeAlbumView = function (){
      var album = albumPicasso;
+
+     debugger;
      
     // update album title 
       var $albumTitle = $(".album-title");
@@ -273,16 +275,36 @@ if(document.URL.match(/\/album.html/)){
 ;require.register("scripts/app", function(exports, require, module) {
 // require("./landing");
 // require("./collection");
-// require("./album");
+ //require("./album");
 // require("./profile");
 
- angular.module('BlocJams', []).controller('Landing.controller', ['$scope', function($scope) {
+angular.module("BlocJams", ["ui.router"]).config(['$stateProvider', '$locationProvider', function($stateProvider, $locationProvider) {
+   $locationProvider.html5Mode(true);
+ 
+   $stateProvider.state('landing', {
+     url: '/',
+     controller: 'Landing.controller',
+     templateUrl: '/templates/landing.html'
+   });
+ }]);
+ 
+ // This is a cleaner way to call the controller than crowding it on the module definition.
+ angular.module("BlocJams").controller('Landing.controller', ['$scope', function($scope) {
   console.log("Landing.controller");
   $scope.mainText = "Bloc Jams";
   $scope.subText = "Turn the music up!";
 
   $scope.subTextClicked = function(){
     $scope.subText += "!";
+  };
+
+  var shuffle = function(o){ //v1.0
+    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+};
+
+  $scope.mainTextClicked = function () {
+    shuffle($scope.albumURLs);
   };
 
     $scope.albumURLs = [

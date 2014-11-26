@@ -94,6 +94,8 @@ var clickHandler = function(event){
 
 var changeAlbumView = function (){
      var album = albumPicasso;
+
+     debugger;
      
     // update album title 
       var $albumTitle = $(".album-title");
