@@ -5,6 +5,7 @@
 
  angular.module('BlocJams', []).controller('Landing.controller', ['$scope', function($scope) {
   console.log("Landing.controller");
+  $scope.mainText = "Bloc Jams";
   $scope.subText = "Turn the music up!";
 
   $scope.subTextClicked = function(){
@@ -22,4 +23,5 @@
        '/images/album-placeholders/album-8.jpg',
        '/images/album-placeholders/album-9.jpg',
     ];
+
  }]);
