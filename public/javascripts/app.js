@@ -92,7 +92,7 @@
 })();
 require.register("scripts/album", function(exports, require, module) {
 // Example Album
-
+/*
 var albumPicasso = {
   name: 'The Colors',
   artist: 'Pablo Picasso',
@@ -270,6 +270,12 @@ if(document.URL.match(/\/album.html/)){
    setupSeekBars();
   });
 }
+
+*/
+
+angular.module("BlocJams").controller("Album", ["$scope", function ($scope) {
+  $scope.name = "Jake";
+}]);
 });
 
 ;require.register("scripts/app", function(exports, require, module) {
@@ -286,6 +292,12 @@ angular.module("BlocJams", ["ui.router"]).config(['$stateProvider', '$locationPr
      controller: 'Landing.controller',
      templateUrl: '/templates/landing.html'
    });
+
+   $stateProvider.state("album", {
+      url: "/album",
+      controller: "Album",
+      templateUrl: "/templates/album.html"
+   })
  }]);
  
  // This is a cleaner way to call the controller than crowding it on the module definition.
