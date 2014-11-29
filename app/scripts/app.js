@@ -87,3 +87,37 @@ angular.module("BlocJams").controller("Collection", ["$scope", function ($scope)
      $scope.albums.push(angular.copy(albumPicasso));
    }
 }]);
+
+angular.module("BlocJams").controller("Album", ["$scope", function ($scope){
+  $scope.album = angular.copy(albumPicasso);
+
+   var hoveredSong = null;
+   var playingSong = null;
+ 
+   $scope.onHoverSong = function(song) {
+     hoveredSong = song;
+   };
+ 
+   $scope.offHoverSong = function(song) {
+     hoveredSong = null;
+   };
+
+    $scope.getSongState = function(song) {
+     if (song === playingSong) {
+       return 'playing';
+     }
+     else if (song === hoveredSong) {
+       return 'hovered';
+     }
+     return 'default';
+   };
+
+
+   $scope.playSong = function(song) {
+      playingSong = song;
+    };
+ 
+    $scope.pauseSong = function(song) {
+      playingSong = null;
+    };
+}]);

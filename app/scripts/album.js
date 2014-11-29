@@ -1,5 +1,5 @@
 // Example Album
-/*
+
 var albumPicasso = {
   name: 'The Colors',
   artist: 'Pablo Picasso',
@@ -178,8 +178,5 @@ if(document.URL.match(/\/album.html/)){
   });
 }
 
-*/
 
-angular.module("BlocJams").controller("Album", ["$scope", function ($scope) {
-  $scope.name = "Jake";
-}]);
+
