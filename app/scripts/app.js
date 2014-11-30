@@ -134,7 +134,7 @@ angular.module("BlocJams").controller("PlayerBar", ["$scope", "SongPlayer", func
 
 }]);
 
-angular.module.service("SongPlayer", function(){
+angular.module("BlocJams").service("SongPlayer", function(){
   return {
     currentSong: null,
     currentAlbum: null,
