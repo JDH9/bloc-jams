@@ -320,6 +320,13 @@ angular.module("BlocJams", ["ui.router"]).config(['$stateProvider', '$locationPr
       controller: "Collection",
       templateUrl: "/templates/collection.html"
    });
+
+ $stateProvider.state("player_bar", {
+      url: "/player_bar",
+      controller: "PlayerBar",
+      templateUrl: "/templates/player_bar.html"
+  });
+
  }]);
 
 
@@ -367,11 +374,10 @@ angular.module("BlocJams").controller("Collection", ["$scope", function ($scope)
    }
 }]);
 
-angular.module("BlocJams").controller("Album", ["$scope", function ($scope){
+angular.module("BlocJams").controller("Album", ["$scope", "SongPlayer", function ($scope, SongPlayer){
   $scope.album = angular.copy(albumPicasso);
 
    var hoveredSong = null;
-   var playingSong = null;
  
    $scope.onHoverSong = function(song) {
      hoveredSong = song;
@@ -382,7 +388,7 @@ angular.module("BlocJams").controller("Album", ["$scope", function ($scope){
    };
 
     $scope.getSongState = function(song) {
-     if (song === playingSong) {
+     if (song === SongPlayer.currentSong && SongPlayer.playing) {
        return 'playing';
      }
      else if (song === hoveredSong) {
@@ -393,13 +399,40 @@ angular.module("BlocJams").controller("Album", ["$scope", function ($scope){
 
 
    $scope.playSong = function(song) {
-      playingSong = song;
+      SongPlayer.setSong($scope.album, song);
+      SongPlayer.play();
     };
  
     $scope.pauseSong = function(song) {
-      playingSong = null;
+      SongPlayer.pause();
     };
 }]);
+
+angular.module("BlocJams").controller("PlayerBar", ["$scope", "SongPlayer", function($scope, SongPlayer){
+  $scope.songPlayer = SongPlayer;
+
+}]);
+
+angular.module.service("SongPlayer", function(){
+  return {
+    currentSong: null,
+    currentAlbum: null,
+    playing: false,
+
+    play: function(){
+      this.playing = true;
+    },
+    pause: function(){
+      this.playing = false;
+    },
+    setSong: function(album, song){
+      this.currentAlbum = album;
+      this.currentSong = song;
+    }
+  };
+});
+
+
 
 });
 
