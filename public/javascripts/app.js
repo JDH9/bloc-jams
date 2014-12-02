@@ -414,7 +414,17 @@ angular.module("BlocJams").controller("Album", ["$scope", "SongPlayer", function
 angular.module("BlocJams").controller("PlayerBar", ["$scope", "SongPlayer", function($scope, SongPlayer){
   $scope.songPlayer = SongPlayer;
 
+
+
 }]);
+
+angular.module("BlocJams").directive("slider", function(){
+  return {
+    templateUrl: '/templates/directives/slider.html',
+    replace: true,
+    restrict: 'E'
+  };
+});
 
 angular.module("BlocJams").service("SongPlayer", function(){
   var currentSoundFile = null;
@@ -468,6 +478,7 @@ angular.module("BlocJams").service("SongPlayer", function(){
     }
   };
 });
+
 
 
 
