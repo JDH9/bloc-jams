@@ -140,10 +140,47 @@ angular.module("BlocJams").controller("PlayerBar", ["$scope", "SongPlayer", func
 }]);
 
 angular.module("BlocJams").directive("slider", function(){
+
+  var updateSeekPercentage = function($seekBar, event){
+    var barWidth = $seekBar.width();
+    var offsetX = event.pageX - $seekBar.offset().left;
+
+    var offsetXPercentage = (offsetX / barWidth) * 100;
+    offsetXPercentage = Math.max(0, offsetXPercentage);
+    offsetXPercentage = Math.min(100, offsetXPercentage);
+
+
+    var percentageString = offsetXPercentage + "%";
+    $seekBar.find('.fill').width(percentageString);
+    $seekBar.find('.thumb').css({left: percentageString});
+  }
+
   return {
-    templateUrl: '/templates/directives/slider.html',
+    templateUrl: '/templates/slider.html',
     replace: true,
-    restrict: 'E'
+    restrict: 'E',
+    link: function(scope, element, attributes){
+
+      var $seekBar = $(element);
+
+      $seekBar.click(function(event){
+        updateSeekPercentage($seekBar, event);
+      });
+
+      $seekBar.find(".thumb").mousedown(function(event){
+        $seekBar.addClass('no-animate');
+
+        $(document).bind('mousemove.thumb', function(event){
+          updateSeekPercentage($seekBar, event);
+        });
+
+        $(document).bind('mouseup.thumb', function(){
+          $seekBar.removeClass('no-animate');
+          $(document).unbind('mousemove.thumb');
+          $(document).unbind('mouseup.thumb');
+        });
+      });
+    }
   };
 });
 
