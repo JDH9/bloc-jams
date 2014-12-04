@@ -139,50 +139,63 @@ angular.module("BlocJams").controller("PlayerBar", ["$scope", "SongPlayer", func
 
 }]);
 
-angular.module("BlocJams").directive("slider", function(){
+angular.module("BlocJams").directive("slider", [ '$document' function($document){
 
-  var updateSeekPercentage = function($seekBar, event){
-    var barWidth = $seekBar.width();
-    var offsetX = event.pageX - $seekBar.offset().left;
-
-    var offsetXPercentage = (offsetX / barWidth) * 100;
-    offsetXPercentage = Math.max(0, offsetXPercentage);
-    offsetXPercentage = Math.min(100, offsetXPercentage);
-
-
-    var percentageString = offsetXPercentage + "%";
-    $seekBar.find('.fill').width(percentageString);
-    $seekBar.find('.thumb').css({left: percentageString});
+  var calculateSliderPercentFromMouseEvent = function($slider, event){
+    var offsetX = event.pageX - $slider.offset().left;
+    var sliderWidth = $slider.width();
+    var offsetXPercent = (offsetX / sliderWidth);
+    offsetXPercent = Math.max(0, offsetXPercent);
+    offsetXPercent = Math.min(1, offsetXPercent);
+    return offsetXPercent;
   }
 
   return {
     templateUrl: '/templates/slider.html',
     replace: true,
     restrict: 'E',
+    scope: {},
     link: function(scope, element, attributes){
 
+      scope.value = 0;
+      scope.max = 200;
       var $seekBar = $(element);
 
-      $seekBar.click(function(event){
-        updateSeekPercentage($seekBar, event);
-      });
+      var percentString = function(){
+        percent = Number(scope.value) / Number(scope.max);
+        return percent + '%';
+      }
 
-      $seekBar.find(".thumb").mousedown(function(event){
-        $seekBar.addClass('no-animate');
+      scope.fillStyle = function (){
+        return {width: percentString()};
+      }
 
-        $(document).bind('mousemove.thumb', function(event){
-          updateSeekPercentage($seekBar, event);
+      scope.thumbStyle = function (){
+        return {left: percentString()};
+      }
+
+      scope.onClickSlider = function(event){
+        var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
+        scope.value = percent * scope.max;
+      }
+
+      scope.trackThumb = function(){
+        $document.bind('mousemove.thumb', function(event){
+          var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
+          scope.$apply(function(){
+            scope.value = percent * scope.max;
+          });
         });
 
-        $(document).bind('mouseup.thumb', function(){
-          $seekBar.removeClass('no-animate');
-          $(document).unbind('mousemove.thumb');
-          $(document).unbind('mouseup.thumb');
-        });
+      $document.bind('mouseup.thumb', function(){
+        $document.unbind('mousemove.thumb');
+        $document.unbind('mouseup.thumb');
       });
+      }
     }
   };
-});
+
+}]);
 
 angular.module("BlocJams").service("SongPlayer", function(){
   var currentSoundFile = null;
