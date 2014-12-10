@@ -414,6 +414,12 @@ angular.module("BlocJams").controller("Album", ["$scope", "SongPlayer", function
 angular.module("BlocJams").controller("PlayerBar", ["$scope", "SongPlayer", function($scope, SongPlayer){
   $scope.songPlayer = SongPlayer;
 
+   SongPlayer.onTimeUpdate(function(event, time){
+     $scope.$apply(function(){
+       $scope.playTime = time;
+     });
+   });
+
 }]);
 
 angular.module("BlocJams").directive("slider", [ "$document", function($document){
@@ -454,7 +460,9 @@ angular.module("BlocJams").directive("slider", [ "$document", function($document
       scope.max = 100;
       var $seekBar = $(element);
       
+      
       attributes.$observe('value', function(newValue) {
+        console.log("value changed", newValue);
         scope.value = numberFromValue(newValue, 0);
       });
  
@@ -463,7 +471,6 @@ angular.module("BlocJams").directive("slider", [ "$document", function($document
       });
 
       var percentString = function(){
-        percent = Number(scope.value) / Number(scope.max) * 100;
           var value = scope.value || 0;
           var max = scope.max || 100;
           percent = value / max * 100;
@@ -486,6 +493,7 @@ angular.module("BlocJams").directive("slider", [ "$document", function($document
 
       scope.trackThumb = function(){
         $document.bind('mousemove.thumb', function(event){
+          // console.log("mousemove");
           var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
           scope.$apply(function(){
             scope.value = percent * scope.max;
@@ -497,9 +505,11 @@ angular.module("BlocJams").directive("slider", [ "$document", function($document
         $document.unbind('mousemove.thumb');
         $document.unbind('mouseup.thumb');
       });
+
       }
 
        var notifyCallback = function(newValue) {
+        // console.log("callback", newValue);
         if(typeof scope.onChange === 'function') {
            scope.onChange({value: newValue});
          }
@@ -508,7 +518,37 @@ angular.module("BlocJams").directive("slider", [ "$document", function($document
   };
 }]);
 
-angular.module("BlocJams").service("SongPlayer", function(){
+
+ angular.module("BlocJams").filter('timecode', function(){
+   return function(seconds) {
+     seconds = Number.parseFloat(seconds);
+ 
+     // Returned when no time is provided.
+     if (Number.isNaN(seconds)) {
+       return '-:--';
+     }
+ 
+     // make it a whole number
+     var wholeSeconds = Math.floor(seconds);
+ 
+     var minutes = Math.floor(wholeSeconds / 60);
+ 
+     remainingSeconds = wholeSeconds % 60;
+ 
+     var output = minutes + ':';
+ 
+     // zero pad seconds, so 9 seconds should be :09
+     if (remainingSeconds < 10) {
+       output += '0';
+     }
+ 
+     output += remainingSeconds;
+ 
+     return output;
+   }
+ })
+
+angular.module("BlocJams").service("SongPlayer",["$rootScope", function($rootScope){
   var currentSoundFile = null;
   var trackIndex = function(album, song){
     return album.songs.indexOf(song);
@@ -552,10 +592,14 @@ angular.module("BlocJams").service("SongPlayer", function(){
          currentSoundFile.setTime(time);
        }
      },
+    onTimeUpdate: function(callback) {
+      return $rootScope.$on('sound:timeupdate', callback);
+    },
     setSong: function(album, song){
       if(currentSoundFile){
         currentSoundFile.stop();
       }
+      console.log("set song", album, song);
       this.currentAlbum = album;
       this.currentSong = song;
       currentSoundFile = new buzz.sound(song.audioUrl, {
@@ -563,10 +607,14 @@ angular.module("BlocJams").service("SongPlayer", function(){
         preload: true
       });
 
+      currentSoundFile.bind('timeupdate', function(e){
+        $rootScope.$broadcast('sound:timeupdate', this.getTime());
+      });
+
       this.play();
     }
   };
-});
+}]);
 
 
 
